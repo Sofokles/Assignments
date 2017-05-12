@@ -15,7 +15,7 @@ import org.w3c.dom.NodeList;
 public class PowerTransformer extends Base_constructor {	
 		
 						//method used to load data and store the data into an arraylist of objects
-						public static void powerTransformer(){		
+						public static ArrayList<PowerTransformer> powerTransformer(ArrayList<PowerTransformer>PowerTransformerList){		
 								
 							try {
 								//read EQ file
@@ -32,21 +32,28 @@ public class PowerTransformer extends Base_constructor {
 								System.out.println("-------------PowerTransformerList----------------");
 								for (int i = 0; i <powerTransformerList.getLength(); i++) {				
 									Node theNode = powerTransformerList.item(i);				
-									extractMethod(theNode);					
+									PowerTransformerList.add(extractMethod(theNode));					
 									}							
 								}
 							catch(Exception e){
 								e.printStackTrace();
-							}							
+							}	
+							return PowerTransformerList;
 						}	
 						
 						//method to extract data and store it into an new base_voltage object
-						public static void extractMethod (Node node){				
+						public static PowerTransformer extractMethod (Node node){				
 							
 							//Searching for values with the method parameter in the class ReadNode		
 							String rdfID = ReadNode.parameter(node,"rdf:ID");
 							String name = ReadNode.parameter(node,"cim:IdentifiedObject.name");	
 							String eq_con_rdfID = ReadNode.parameter(node,"cim:Equipment.EquipmentContainer").substring(1);							
+							
+							//create an object and set values
+							PowerTransformer obj = new PowerTransformer();		
+							obj.setRdfID(rdfID);
+							obj.setName(name);		
+							obj.setEq_con_rdfID(eq_con_rdfID);	
 							
 							//print
 							System.out.println("rdfID: " + rdfID + "; Name: " + name + "; Eq_con_rdfID: " + eq_con_rdfID);	
@@ -63,7 +70,10 @@ public class PowerTransformer extends Base_constructor {
 							}
 							catch(Exception e){
 								System.out.println(e);
-							}			
+							}	
+							
+							//return the object
+							return obj;		
 						}						
 						
 						

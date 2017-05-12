@@ -1,8 +1,6 @@
 package Assignment;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,7 +16,7 @@ public class EnergyConsumer extends Base_constructor {
 		private static double Q;
 		
 		//method used to load data and store the data into an arraylist of objects
-		public static void energyConsumer(){		
+		public static void energyConsumer(ArrayList<EnergyConsumer>EnergyConsumerList){		
 				
 			try {
 				//read EQ file
@@ -35,7 +33,7 @@ public class EnergyConsumer extends Base_constructor {
 				System.out.println("-------------EnergyConsumerList----------------");	
 				for (int i = 0; i <energyConsumerList.getLength(); i++) {				
 					Node theNode = energyConsumerList.item(i);				
-					extractMethod(theNode);					
+					EnergyConsumerList.add(extractMethod(theNode));					
 					}							
 				}
 			catch(Exception e){
@@ -44,7 +42,7 @@ public class EnergyConsumer extends Base_constructor {
 		}	
 		
 		//method to extract data and store it into an new object
-		public static void extractMethod (Node node){				
+		public static EnergyConsumer extractMethod (Node node){				
 			
 			//Searching for values with the method parameter in the class ReadNode		
 			String rdfID = ReadNode.parameter(node,"rdf:ID");
@@ -79,28 +77,21 @@ public class EnergyConsumer extends Base_constructor {
 				e.printStackTrace();
 			}			
 			
+			//create an object and set values
+			EnergyConsumer obj = new EnergyConsumer();		
+			obj.setRdfID(rdfID);
+			obj.setName(name);				
+			obj.setP(P);
+			obj.setQ(Q);		
+			obj.setEq_con_rdfID(eq_con_rdfID);
+			
 			//print
 			System.out.println("rdfID: " + rdfID + "; Name: " + name + "; P: " + P + "; Q: " + Q + "; Eq_con_rdfID: " + eq_con_rdfID);	
 			
-			//save data in SQL database
-			try{
-				Connection conn1 = (Connection) Connectingdatabase.makeConnection();			
-				String query = "insert into EnergyConsumer values (?,?,?,?,?)";
-				PreparedStatement preparedStmt = conn1.prepareStatement(query);
-				preparedStmt.setString(1, rdfID);
-				preparedStmt.setString(2, name);				
-				preparedStmt.setDouble(3, P);
-				preparedStmt.setDouble(4, Q);				
-				preparedStmt.setString(5, eq_con_rdfID);			
-				preparedStmt.execute();
-			}
-			catch(Exception e){
-				System.out.println(e);
-			}	
-			
-		}	
+			//return the object
+			return obj;		
+		}		
 		
-
 	}
 
 

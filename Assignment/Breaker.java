@@ -14,10 +14,10 @@ import org.w3c.dom.NodeList;
 
 public class Breaker extends Base_constructor {	
 						
-			private static String state;			
+			private static boolean state;			
 			
 			//method used to load data and store the data into an arraylist of objects
-			public static void breaker(){		
+			public static void breaker(ArrayList<Breaker>BreakerList){		
 					
 				try {
 					//read EQ file
@@ -34,7 +34,7 @@ public class Breaker extends Base_constructor {
 					System.out.println("-------------BreakerList----------------");	
 					for (int i = 0; i <breakerList.getLength(); i++) {				
 						Node theNode = breakerList.item(i);				
-						extractMethod(theNode);					
+						BreakerList.add(extractMethod(theNode));					
 						}							
 					}
 				catch(Exception e){
@@ -43,7 +43,7 @@ public class Breaker extends Base_constructor {
 			}	
 			
 			//method to extract data and store it into an new object
-			public static void extractMethod (Node node){				
+			public static Breaker extractMethod (Node node){				
 				
 				//Searching for values with the method parameter in the class ReadNode		
 				String rdfID = ReadNode.parameter(node,"rdf:ID");
@@ -64,18 +64,28 @@ public class Breaker extends Base_constructor {
 					//for-loop to to store the loaded XML-data "basvoltList.doc" as objects in the object array 				
 					for (int i = 0; i <energyConsumerList2.getLength(); i++) {				
 						Node theNode2 = energyConsumerList2.item(i);				
-						String rdfID2 = ReadNode.parameter(theNode2,"rdf:about").substring(1);												
+						String rdfID2 = ReadNode.parameter(theNode2,"rdf:about");							
+						String rdfID1 = 	"#" + rdfID;	
+						//System.out.println("rdfID2: " + rdfID2 + " rdfID1: " + rdfID1);							
 						
-						if (rdfID2.equals(rdfID)){
+						if (rdfID2.equals(rdfID1)){
 							//System.out.println("rdfID: " + rdfID2);
-							state = ReadNode.parameter(theNode2,"cim:Switch.open");							
+							state = Boolean.parseBoolean(ReadNode.parameter(theNode2,"cim:Switch.open"));							
 						}
 						
-					}							
-				}
+						}							
+					}
 				catch(Exception e){
 					e.printStackTrace();
-				}				
+				}
+				
+				//create an object and set values
+				Breaker obj = new Breaker();		
+				obj.setRdfID(rdfID);
+				obj.setName(name);					
+				obj.setEq_con_rdfID(eq_con_rdfID);
+				obj.setState(state);
+				
 				//print
 				System.out.println("rdfID: " + rdfID + "; Name: " + name + "; State: " + state + "; Eq_con_rdfID: " + eq_con_rdfID);	
 				
@@ -86,16 +96,19 @@ public class Breaker extends Base_constructor {
 					PreparedStatement preparedStmt = conn1.prepareStatement(query);
 					preparedStmt.setString(1, rdfID);
 					preparedStmt.setString(2, name);				
-					preparedStmt.setString(3, state);					
+					preparedStmt.setBoolean(3, state);					
 					preparedStmt.setString(4, eq_con_rdfID);
 					preparedStmt.execute();
 				}
 				catch(Exception e){
 					System.out.println(e);
 				}		
-			}			
+				
+				//return the object
+				return obj;		
+			}		
 			
-					
+				
 		}
 
 

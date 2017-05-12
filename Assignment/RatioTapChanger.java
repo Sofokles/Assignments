@@ -14,10 +14,10 @@ import org.w3c.dom.NodeList;
 
 public class RatioTapChanger extends Base_constructor {
 		
-						private static double step;						
+		private static double step;								
 						
 						//method used to load data and store the data into an arraylist of objects
-						public static void ratioTapChanger(){		
+						public static void ratioTapChanger(ArrayList<RatioTapChanger>RatioTapChangerList){		
 								
 							try {
 								//read EQ file
@@ -34,7 +34,7 @@ public class RatioTapChanger extends Base_constructor {
 								System.out.println("-------------RatioTapChangerList----------------");	
 								for (int i = 0; i <ratioTapChangerList.getLength(); i++) {				
 									Node theNode = ratioTapChangerList.item(i);				
-									extractMethod(theNode);					
+									RatioTapChangerList.add(extractMethod(theNode));					
 									}							
 								}
 							catch(Exception e){
@@ -43,7 +43,7 @@ public class RatioTapChanger extends Base_constructor {
 						}	
 						
 						//method to extract data and store it into an new base_voltage object
-						public static void extractMethod (Node node){				
+						public static RatioTapChanger extractMethod (Node node){				
 							
 							//Searching for values with the method parameter in the class ReadNode		
 							String rdfID = ReadNode.parameter(node,"rdf:ID");
@@ -76,7 +76,14 @@ public class RatioTapChanger extends Base_constructor {
 							catch(Exception e){
 								e.printStackTrace();
 							}
-													
+							
+							
+							//create an object and set values
+							RatioTapChanger obj = new RatioTapChanger();		
+							obj.setRdfID(rdfID);
+							obj.setName(name);		
+							obj.setStep(step);	
+							
 							//print
 							System.out.println("rdfID: " + rdfID + "; Name: " + name + "; Step: " + step );		
 							
@@ -92,9 +99,11 @@ public class RatioTapChanger extends Base_constructor {
 							}
 							catch(Exception e){
 								System.out.println(e);
-							}			
-						}
-						
+							}	
+							
+							//return the object
+							return obj;		
+						}					
 						
 						
 		}

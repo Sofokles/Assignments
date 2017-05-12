@@ -12,15 +12,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class GeneratingUnit extends Base_constructor {
-				
-			private static String name;				
-			private static String maxP;
-			private static String minP;
-			private static String eq_con_rdfID;
+public class GeneratingUnit extends Base_constructor {			
 			
 			//method used to load data and store the data into an arraylist of objects
-			public static void generatingUnit(){		
+			public static void generatingUnit(ArrayList<GeneratingUnit> GeneratingUnitList){		
 					
 				try {
 					//read EQ file
@@ -37,7 +32,7 @@ public class GeneratingUnit extends Base_constructor {
 					System.out.println("-------------GeneratingUnitList----------------");	
 					for (int i = 0; i < generatingUnitList.getLength(); i++) {				
 						Node theNode = generatingUnitList.item(i);				
-						extractMethod(theNode);					
+						GeneratingUnitList.add(extractMethod(theNode));					
 						}							
 					}
 				catch(Exception e){
@@ -46,18 +41,26 @@ public class GeneratingUnit extends Base_constructor {
 			}	
 			
 			//method to extract data and store it into an new base_voltage object
-			public static void extractMethod (Node node){				
+			public static GeneratingUnit extractMethod (Node node){				
 				
 				//Searching for values with the method parameter in the class ReadNode		
 				String rdfID = ReadNode.parameter(node,"rdf:ID");
 				String name = ReadNode.parameter(node,"cim:IdentifiedObject.name");	
-				String maxP = ReadNode.parameter(node,"cim:GeneratingUnit.maxOperatingP");
-				String minP = ReadNode.parameter(node,"cim:GeneratingUnit.minOperatingP");
-				String eq_con_rdfID = ReadNode.parameter(node,"cim:Equipment.EquipmentContainer").substring(1);			
+				double maxP = Double.parseDouble(ReadNode.parameter(node,"cim:GeneratingUnit.maxOperatingP"));
+				double minP = Double.parseDouble(ReadNode.parameter(node,"cim:GeneratingUnit.minOperatingP"));
+				String eq_con_rdfID = ReadNode.parameter(node,"cim:Equipment.EquipmentContainer").substring(1);
+								
+				//create an object and set values
+				GeneratingUnit obj = new GeneratingUnit();		
+				obj.setRdfID(rdfID);
+				obj.setName(name);		
+				obj.setMaxP(maxP);
+				obj.setMinP(minP);
+				obj.setEq_con_rdfID(eq_con_rdfID);
 				
 				//print
 				System.out.println("rdfID: " + rdfID + "; Name: " + name + "; MaxP: " + maxP + "; MinP: " + minP + "; Eq_con_rdfID: " + eq_con_rdfID );	
-					
+				
 				//save data in SQL database
 				try{
 					Connection conn1 = (Connection) Connectingdatabase.makeConnection();			
@@ -65,15 +68,18 @@ public class GeneratingUnit extends Base_constructor {
 					PreparedStatement preparedStmt = conn1.prepareStatement(query);
 					preparedStmt.setString(1, rdfID);
 					preparedStmt.setString(2, name);
-					preparedStmt.setString(3, maxP);
-					preparedStmt.setString(4, minP);
+					preparedStmt.setDouble(3, maxP);
+					preparedStmt.setDouble(4, minP);
 					preparedStmt.setString(5, eq_con_rdfID);
 					preparedStmt.execute();
 					}
 				catch(Exception e){
 					System.out.println(e);
 					}		
-			}			
+				
+				//return the object
+				return obj;		
+			}		
 			
 			
 				

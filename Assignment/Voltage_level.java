@@ -14,12 +14,10 @@ import org.w3c.dom.NodeList;
 
 public class Voltage_level extends Base_constructor {
 			
-		private static String name;				
-		private static String sub_rdfID;
-		private static String base_volt_rdfID;
+
 		
 		//method used to load data and store the data into an arraylist of objects
-		public static void voltage_level(){		
+		public static void voltage_level(ArrayList<Voltage_level> Voltage_levelList){		
 				
 			try {
 				//read EQ file
@@ -36,7 +34,7 @@ public class Voltage_level extends Base_constructor {
 				System.out.println("-------------Voltage_levelList----------------");
 				for (int i = 0; i < voltage_levelList.getLength(); i++) {				
 					Node theNode = voltage_levelList.item(i);				
-					extractMethod(theNode);					
+					Voltage_levelList.add(extractMethod(theNode));					
 					}							
 				}
 			catch(Exception e){
@@ -45,13 +43,20 @@ public class Voltage_level extends Base_constructor {
 		}	
 		
 		//method to extract data and store it into an new base_voltage object
-		public static void extractMethod (Node node){				
+		public static Voltage_level extractMethod (Node node){				
 			
 			//Searching for values with the method parameter in the class ReadNode		
 			String rdfID = ReadNode.parameter(node,"rdf:ID");
 			String name = ReadNode.parameter(node,"cim:IdentifiedObject.name");	
 			String sub_rdfID = ReadNode.parameter(node,"cim:VoltageLevel.Substation").substring(1);
-			String base_volt_rdfID = ReadNode.parameter(node,"cim:VoltageLevel.BaseVoltage").substring(1);			
+			String base_volt_rdfID = ReadNode.parameter(node,"cim:VoltageLevel.BaseVoltage").substring(1);
+			
+			//create an object and set values
+			Voltage_level obj = new Voltage_level();		
+			obj.setRdfID(rdfID);
+			obj.setName(name);		
+			obj.setSub_rdfID(sub_rdfID);
+			obj.setBase_volt_rdfID(base_volt_rdfID);
 			
 			//print
 			System.out.println("rdfID: " + rdfID + "; Name: " + name + "; Sub_rdfID: " + sub_rdfID + "; Base_volt_rdfID: " + base_volt_rdfID);		
@@ -69,10 +74,12 @@ public class Voltage_level extends Base_constructor {
 				}
 			catch(Exception e){
 				System.out.println(e);
-				}		
+				}	
+			
+			//return the object
+			return obj;		
 		}		
-		
-		
+
 			
 	}
 

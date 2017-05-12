@@ -3,6 +3,7 @@ package Assignment;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,14 +12,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class ACLineSegment {
-
-	private static String name;		
-	private static String reg_rdfID;	
+public class ACLineSegment extends Base_constructor {	
 	
 	//method used to load data and store the data into an arraylist of objects
-	public static void aCLineSegment(){		
-			
+	public static void aCLineSegment(ArrayList<ACLineSegment> ACLineSegmentList){		
+		
 		try {
 			//read EQ file
 			File XmlFile = new File("MicroGridTestConfiguration_T1_BE_EQ_V2.xml");
@@ -33,8 +31,8 @@ public class ACLineSegment {
 			//for-loop to to store the loaded XML-data "basvoltList.doc" as objects in the object array 
 			System.out.println("-------------ACLineSegmentList----------------");	
 			for (int i = 0; i < aCLineSegmentList.getLength(); i++) {				
-				Node theNode = aCLineSegmentList.item(i);				
-				extractMethod(theNode);					
+				Node theNode = aCLineSegmentList.item(i);		
+				ACLineSegmentList.add(extractMethod(theNode));									
 				}							
 			}
 		catch(Exception e){
@@ -43,13 +41,14 @@ public class ACLineSegment {
 	}	
 	
 	//method to extract data and store it into an new base_voltage object
-	public static void extractMethod (Node node){				
+	public static ACLineSegment extractMethod (Node node){				
 		
 		//Searching for values with the method parameter in the class ReadNode		
 		String rdfID = ReadNode.parameter(node,"rdf:ID");
 		String name = ReadNode.parameter(node,"cim:IdentifiedObject.name");	
 		double r = Double.parseDouble(ReadNode.parameter(node,"cim:ACLineSegment.r"));
 		double x = Double.parseDouble(ReadNode.parameter(node,"cim:ACLineSegment.x"));
+		String baseVolt_rdfID = ReadNode.parameter(node,"cim:ConductingEquipment.BaseVoltage").substring(1);
 					
 		//print
 		System.out.println("rdfID: " + rdfID + "; Name: " + name + "; r: " + r + "; x: " + x);
@@ -68,6 +67,17 @@ public class ACLineSegment {
 		catch(Exception e){
 			System.out.println(e);
 			}	
+		
+		//create an object and set values
+		ACLineSegment obj = new ACLineSegment();		
+		obj.setRdfID(rdfID);
+		obj.setName(name);				
+		obj.setR(r);
+		obj.setX(x);		
+		obj.setBase_volt_rdfID(baseVolt_rdfID);
+		//obj.setEq_con_rdfID(eq_con_rdfID);
+		
+		return obj;
 	}
 
 		

@@ -1,127 +1,128 @@
 package Assignment;
 
 import java.awt.BorderLayout;
-import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class Ybus {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		double[][] Zmatrix = new double[5][2]; 
-		
-		//resistance
-		double r1 =  1;
-		double r2 = 1;
-		double r3  = 1;
-		double r4 = 1;
-		double r5 = 1;
-		
-		double x1 =  1;
-		double x2 = 1;
-		double x3  = 1;
-		double x4 = 1;
-		double x5 = 1;
+	//calculating Ybus using ConnectedBus2BusList2, PowerTransformerList, ACLineSegmentList
+		public static void ybus(ArrayList<ConnectedBus2Bus>ConnectedBus2BusList2){		
 		
 					
-		// creating complex impedience
-		Complex Z0 = new Complex(1,0);
-		Complex Z1 = Complex(r1,x1);
-		Complex Z2 = new Complex(r2,x2);
-		Complex Z3 = new Complex(r3,x3);
+		//initalize complex values and store data				
+		Complex zero = new Complex(0,0);
+		Complex Z0 = new Complex(1,0);		
+		Complex [][] data = new Complex [5][5];
 		
-		// calculate admittance of each line
-		Complex Y_13 = Z0.divides(Z1);
-		Complex Y_12 = Z0.divides(Z2);
-		Complex Y_23 = Z0.divides(Z3);
+		//calculate Y-bus--------------
+		//int size = ConnectedBus2BusList2.size();
+		for (int i = 0; i <ConnectedBus2BusList2.size(); i++) {	
+			int bus1 = ConnectedBus2BusList2.get(i).getBusNum();
+			int bus2 = ConnectedBus2BusList2.get(i).getBus2Num();
+			
+			//Set base values					
+			double Base_V = ConnectedBus2BusList2.get(i).getBase_volt();
+			double Base_S = ConnectedBus2BusList2.get(i).getBase_S();					
+			double Z_base = Base_V*Base_V/Base_S;
+			
+			//calculate admittances Y for all one line connections
+			if (ConnectedBus2BusList2.get(i).getLineNum()>-1){
+				
+				//get data
+				double r_line1 = ConnectedBus2BusList2.get(i).getR_Line1();
+				double x_line1 = ConnectedBus2BusList2.get(i).getX_Line1();						
+				
+				//per unit calc
+				double r_line1_pu = r_line1/Z_base;
+				double x_line1_pu = x_line1/Z_base;
+				Complex Z_line1_pu = new Complex(r_line1_pu,x_line1_pu);
+				
+				//Calculating the element of Ybus matrix
+				Complex Y_L1 = zero.minus(Z0.divides(Z_line1_pu));
+				
+				//store data
+				data[bus1][bus2] = Y_L1;
+				data[bus2][bus1] = Y_L1;
+			}
+			//calculate admittances Y for all two line connections
+			if (ConnectedBus2BusList2.get(i).getLine2Num()>-1){
+				//get data
+				double r_line1 = ConnectedBus2BusList2.get(i).getR_Line1();
+				double x_line1 = ConnectedBus2BusList2.get(i).getX_Line1();		
+				double r_line2 = ConnectedBus2BusList2.get(i).getR_Line2();
+				double x_line2 = ConnectedBus2BusList2.get(i).getX_Line2();						
+				
+				//per unit calc
+				double r_line1_pu = r_line1/Z_base;
+				double x_line1_pu = x_line1/Z_base;
+				Complex Z_line1_pu = new Complex(r_line1_pu,x_line1_pu);
+				double r_line2_pu = r_line2/Z_base;
+				double x_line2_pu = x_line2/Z_base;
+				Complex Z_line2_pu = new Complex(r_line2_pu,x_line2_pu);						
+				
+				//Calculating the element of Ybus matrix
+				Complex Y_L1 = zero.minus(Z0.divides(Z_line1_pu));
+				Complex Y_L2 = zero.minus(Z0.divides(Z_line2_pu));
+				
+				//System.out.println( Y_L1+ "	" + Y_L2 + "	" + r_line2 + "	" + x_line2 + "	" + r_line1 + "	" + x_line1);
+				//store data
+				data[bus1][bus2] = Y_L2.plus(Y_L1);
+				data[bus2][bus1] = Y_L2.plus(Y_L1);
+			}
+			//calculate admittances Y for all powertransformer connections
+			else if (ConnectedBus2BusList2.get(i).getTrafoNum()>-1){
+				//get data
+				double r_trafo = ConnectedBus2BusList2.get(i).getR_trafo();
+				double x_trafo = ConnectedBus2BusList2.get(i).getX_trafo();						
+				
+				//per unit calc
+				double r_trafo_pu = r_trafo/Z_base;
+				double x_trafo_pu = x_trafo/Z_base;
+				Complex Z_trafo_pu = new Complex(r_trafo_pu,x_trafo_pu);
+				
+				//Calculating the element of Ybus matrix
+				Complex Y_T1 = zero.minus(Z0.divides(Z_trafo_pu));
+				
+				//store data
+				data[bus1][bus2] = Y_T1;
+				data[bus2][bus1] = Y_T1;
+			}
+			//set all others to zero.. 
+			else {
+				Complex Y_0 = zero;
+				data[bus1][bus2] = Y_0;
+				data[bus2][bus1] = Y_0;
+			}			
+		}
 		
-		// calculate the elements of Ybus matrix
-		Complex Y11 = Y_13.plus(Y_12);
-		Complex Y12 = zero.minus(Y_12);
-		Complex Y13 = zero.minus(Y_13);
-		Complex Y21 = zero.minus(Y_12);
-		Complex Y22 = Y_12.plus(Y_23);
-		Complex Y23 = zero.minus(Y_23);
-		Complex Y31 = zero.minus(Y_13);
-		Complex Y32 = zero.minus(Y_23);
-		Complex Y33 = Y_13.plus(Y_23);
+		//calculate the Yxx, summerize...
+		for (int i = 0; i <5; i++) {	
+			data[i][i] = zero;
+			for (int i2 = 0; i2 <5; i2++) {	
+				if (i!=i2){
+					data[i][i] = data[i][i].minus(data[i][i2]);
+				}
+			}
+		}
 		
-		
-		
-
+		//plott the Y-bus
+		JFrame frame = new JFrame();				
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    
+	    Object rowData[][] = data;
+	    Object columnNames[] = { "Y_i1", "Y_i2", "Y_i3", "Y_i4", "Y_i5", };
+	    
+	    JTable table = new JTable(rowData, columnNames);
+	    JScrollPane scrollPane = new JScrollPane(table);
+	    frame.add(scrollPane, BorderLayout.CENTER);
+	    frame.setSize(1024, 500);
+	    frame.setTitle("Y-bus");
+	    frame.setVisible(true);
 	}
-	  // AcLineSigment return method which returns value of r and x.
-	   public static Double[]  AcLineSigment (Node node){
-		  
-			Double[] R_and_X = new Double[2];
-			R_and_X[0]  = Double.parseDouble(ReadData.parameter(node, "cim:ACLineSegment.r"));
-			R_and_X [1] = Double.parseDouble(ReadData.parameter(node, "cim:ACLineSegment.x"));
-			
-			return R_and_X;
-	        }
-	   
-	   // Ybus is non-return method which Y-matrix of 3 bus system
-	   
-	   public static void Ybus( Double[][] impedance ){
-		   
-		   // Seperate r and x of each line
-		    double r1 = impedance[0][0];
-			double x1 = impedance[0][1]; 
-			double r2 = impedance[1][0]; 
-			double x2 = impedance[1][1];
-			double r3 = impedance[2][0]; 
-			double x3 = impedance[2][1];
-			
-			// pasess the values through the Complex class and calculate line impedances
-			Complex zero = new Complex(0,0);
-			Complex Z0 = new Complex(1,0);
-			Complex Z1 = new Complex(r1,x1);
-			Complex Z2 = new Complex(r2,x2);
-			Complex Z3 = new Complex(r3,x3);
-			
-			// calculate admittance of each line
-			Complex Y_13 = Z0.divides(Z1);
-			Complex Y_12 = Z0.divides(Z2);
-			Complex Y_23 = Z0.divides(Z3);
-			
-			// calculate the elements of Ybus matrix
-			Complex Y11 = Y_13.plus(Y_12);
-			Complex Y12 = zero.minus(Y_12);
-			Complex Y13 = zero.minus(Y_13);
-			Complex Y21 = zero.minus(Y_12);
-			Complex Y22 = Y_12.plus(Y_23);
-			Complex Y23 = zero.minus(Y_23);
-			Complex Y31 = zero.minus(Y_13);
-			Complex Y32 = zero.minus(Y_23);
-			Complex Y33 = Y_13.plus(Y_23);
-			
-			JFrame frame = new JFrame();
-			
-		    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		    Object rowData[][] = { { Y11, Y12, Y13 },
-		    					   { Y21, Y22, Y23 } ,
-		    					   { Y31, Y32, Y33 } ,
-		        };
-		   
-		    Object columnNames[] = { "Y_i1", "Y_i2", "Y_i3" };
-		    
-		    JTable table = new JTable(rowData, columnNames);
-		    JScrollPane scrollPane = new JScrollPane(table);
-		    frame.add(scrollPane, BorderLayout.CENTER);
-		    frame.setSize(1024, 500);
-		    frame.setTitle("Y-matrix");
-		    frame.setVisible(true);
-														   
-	   }         
 }
+      

@@ -12,12 +12,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class RegulatingControl extends Base_constructor {	
-	
-					private static double targetValue;					
+public class RegulatingControl extends Base_constructor {		
+									
+					private static double targetValue;				
 					
 					//method used to load data and store the data into an arraylist of objects
-					public static void regulatingControl(){		
+					public static void regulatingControl(ArrayList<RegulatingControl>RegulatingControlList){		
 							
 						try {
 							//read EQ file
@@ -34,7 +34,7 @@ public class RegulatingControl extends Base_constructor {
 							System.out.println("-------------RegulatingControlList----------------");	
 							for (int i = 0; i <regulatingControlList.getLength(); i++) {				
 								Node theNode = regulatingControlList.item(i);				
-								extractMethod(theNode);					
+								RegulatingControlList.add(extractMethod(theNode));					
 								}							
 							}
 						catch(Exception e){
@@ -43,11 +43,16 @@ public class RegulatingControl extends Base_constructor {
 					}	
 					
 					//method to extract data and store it into an new base_voltage object
-					public static void extractMethod (Node node){				
+					public static RegulatingControl extractMethod (Node node){				
 						
 						//Searching for values with the method parameter in the class ReadNode		
 						String rdfID = ReadNode.parameter(node,"rdf:ID");
 						String name = ReadNode.parameter(node,"cim:IdentifiedObject.name");							
+						
+						//create an object and set values
+						RegulatingControl obj = new RegulatingControl();		
+						obj.setRdfID(rdfID);
+						obj.setName(name);
 						
 						//need to go through SSH file
 						try {
@@ -59,8 +64,8 @@ public class RegulatingControl extends Base_constructor {
 							doc2.getDocumentElement().normalize();//normalize EQ file ( which returns root element of the file and then normalize your XML object.)			
 							
 							//reads all "cim:BaseVoltage" to a list called basvoltList from the DOM-doc
-							NodeList regulatingControl2 = doc2.getElementsByTagName("cim:RegulatingControl"); 
-										
+							NodeList regulatingControl2 = doc2.getElementsByTagName("cim:RegulatingControl"); 							
+							
 							//for-loop to to store the loaded XML-data "basvoltList.doc" as objects in the object array 								
 							for (int i = 0; i <regulatingControl2.getLength(); i++) {				
 								Node theNode2 = regulatingControl2.item(i);				
@@ -68,14 +73,18 @@ public class RegulatingControl extends Base_constructor {
 								
 								if (rdfID2.equals(rdfID)){
 									//System.out.println("rdfID: " + rdfID2);
-									targetValue = Double.parseDouble(ReadNode.parameter(theNode2,"cim:RegulatingControl.targetValue"));	
+									double targetValue = Double.parseDouble(ReadNode.parameter(theNode2,"cim:RegulatingControl.targetValue"));	
+									obj.setTargetValue(targetValue);	
 								}
 								
 							}							
 						}
 						catch(Exception e){
 							e.printStackTrace();
-						}							
+						}			
+						
+								
+						
 						
 						//print
 						System.out.println("rdfID: " + rdfID + "; Name: " + name + "; TargetValue: " + targetValue );		
@@ -92,19 +101,13 @@ public class RegulatingControl extends Base_constructor {
 						}
 						catch(Exception e){
 							System.out.println(e);
-						}		
-					}
+						}					
 					
-					
-					//set-methods	
-					public void setTargetValue(String targetValue_1){		
-						targetValue = targetValue_1;				
+					//return the object
+					return obj;		
 					}				
 					
-					//get-methods
-					public static String getTargetValue(){		 
-						return targetValue;		
-					}
+					
 	}
 
 	

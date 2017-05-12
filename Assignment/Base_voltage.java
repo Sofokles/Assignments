@@ -14,11 +14,9 @@ import org.w3c.dom.NodeList;
 
 //Creating an object
 public class Base_voltage extends Base_constructor {
-
-	private static double nom_val;		
 		
 	//method used to load data from XML-CIM file and store the data into mySQL database
-	public static void base_voltage(){
+	public static void base_voltage(ArrayList<Base_voltage> Base_voltageList){
 		
 			
 		try {
@@ -35,8 +33,9 @@ public class Base_voltage extends Base_constructor {
 			//for-loop to to store the loaded XML-data list in a SQL database
 			System.out.println("-------------Base_voltageList----------------");	
 			for (int i = 0; i < basvoltList.getLength(); i++) {				
-				Node theNode = basvoltList.item(i);						
-				extractMethod(theNode);	
+				Node theNode = basvoltList.item(i);	
+				Base_voltageList.add(new Base_voltage());
+				extractMethod(theNode, Base_voltageList.get(i));				
 				}							
 			}
 		catch(Exception e){
@@ -45,12 +44,16 @@ public class Base_voltage extends Base_constructor {
 	}	
 	
 	//method to extract data and store it into an new base_voltage object
-	public static void extractMethod (Node node){
+	public static void extractMethod (Node node, Base_voltage obj){
 		
 		//Searching for values with the method parameter in the class ReadNode		
 		String rdfID = ReadNode.parameter(node,"rdf:ID");
 		double nom_val = Double.parseDouble(ReadNode.parameter(node,"cim:BaseVoltage.nominalVoltage"));		
 		
+		//set values to object		
+		obj.setRdfID(rdfID);
+		obj.setNom_val(nom_val);		
+				
 		//for-loop using method to print values to see if it is correct								
 		System.out.println("rdfID: " + rdfID + "; nomVal: " + nom_val);	
 		
@@ -63,9 +66,7 @@ public class Base_voltage extends Base_constructor {
 			preparedStmt.setDouble(2, nom_val);		
 			preparedStmt.execute();
 			}
-		catch(Exception e){
-			System.out.println(e);
-			}	
+			catch(Exception e){System.out.println(e);}		
 		
 	}
 		

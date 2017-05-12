@@ -2,7 +2,6 @@ package Assignment;
 
 import java.sql.*;
 
-
 public class Connectingdatabase {	
 	
 		// Building a null constructor for class
@@ -116,7 +115,7 @@ public class Connectingdatabase {
 						" FOREIGN KEY (equimentContainerRdfId) REFERENCES Substation(rdfId))";
 				stmt.executeUpdate(sql);
 				
-				// Creat table for Loads
+				// Creat table for EnergyConsumer
 				
 				sql = "CREATE TABLE IF NOT EXISTS EnergyConsumer " +
 						"(rdfId VARCHAR(255), " +
