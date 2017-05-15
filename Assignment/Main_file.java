@@ -8,6 +8,7 @@ public class Main_file {
 	//2. IT CONSIDER BREAKER STATES
 	//3. IT PRINTS THE CONNECTIONS BETWEEN BUSSES AND CORRESPONDING LINES/POWERTRANSFORMERS
 	//4. ALL IMPORTANT DATA ARE STORED AS OBJECTS WITH CORRESPONDING SET/GET METHODS
+	//5. THE Y-BUS CALCULATION TAKES SHUNTS AT BUSSES INTO ACCOUNT
 	
 	//CREATING ARRAYLISTS TO STORE THE OBJECTS
 	public static ArrayList<Base_voltage> Base_voltageList = new ArrayList<Base_voltage>(); 
@@ -24,7 +25,9 @@ public class Main_file {
 	public static ArrayList<ACLineSegment> ACLineSegmentList = new ArrayList<ACLineSegment>(); 
 	public static ArrayList<Busbar> BusbarList = new ArrayList<Busbar>(); 
 	public static ArrayList<Terminal> TerminalList = new ArrayList<Terminal>(); 
+	public static ArrayList<Shunts> ShuntsList = new ArrayList<Shunts>(); 	
 	public static ArrayList<ConnectedBus2Bus> ConnectedBus2BusList = new ArrayList<ConnectedBus2Bus>(); 
+	public static ArrayList<ConnectedBus2Shunt> ConnectedBus2ShuntList = new ArrayList<ConnectedBus2Shunt>();
 	
 	//MAIN CLASS EXECUTING THE PROGRAM
 	public static void main(String[] args) {		
@@ -52,6 +55,7 @@ public class Main_file {
 			ACLineSegment.aCLineSegment(ACLineSegmentList);	
 			Busbar.busbar(BusbarList);	//Busbar, extra: The basbarList only contains Busbars with uniqe Eq_con_rdfID
 			Terminal.terminal(TerminalList);	
+			Shunts.shunts(ShuntsList);	
 		
 		//----------------------------------------------------------------------------------------------------
 		//TASK 3, CALCULATE THE YBUS
@@ -59,7 +63,7 @@ public class Main_file {
 		
 		//Call the method and CREATE ConnectedBus2BusList with all connections
 		ConnectedBus2BusList = findConnections(TerminalList, BreakerList, BusbarList, PowerTransformerList, PowerTransformerEndList, ACLineSegmentList,
-				SynchronousMachineList, Base_voltageList);
+				SynchronousMachineList, Base_voltageList, ShuntsList);
 			
 		//USING THE METHOD YBUS IN THE YBUS CLASS TO CALCULATE THE YBUS MATRIX USING THE ConnectedBus2BusList ARRAYLIST
 		Ybus.ybus(ConnectedBus2BusList);
@@ -74,12 +78,15 @@ public class Main_file {
 	//connected between them
 	public static ArrayList<ConnectedBus2Bus> findConnections(ArrayList<Terminal>TerminalList, ArrayList<Breaker>BreakerList, ArrayList<Busbar>BusbarList, 
 			ArrayList<PowerTransformer>PowerTransformerList, ArrayList<PowerTransformerEnd>PowerTransformerEndList, ArrayList<ACLineSegment>ACLineSegmentList,
-			ArrayList<SynchronousMachine>SynchronousMachineList, ArrayList<Base_voltage>Base_voltageList) {
+			ArrayList<SynchronousMachine>SynchronousMachineList, ArrayList<Base_voltage>Base_voltageList, ArrayList<Shunts>ShuntsList ) {
 		
 		//ConnectionBus2Trafo
 		ArrayList<ConnectedBus2Trafo> ConnectedBus2TrafoList = new ArrayList<ConnectedBus2Trafo>(); 
 		//ConnectionBus2Line
-		ArrayList<ConnectedBus2Line> ConnectedBus2LineList = new ArrayList<ConnectedBus2Line>(); 
+		ArrayList<ConnectedBus2Line> ConnectedBus2LineList = new ArrayList<ConnectedBus2Line>();
+		//ConnectionBus2Shunt
+		
+		
 		
 		//1. Starting with each busbar
 		for (int i = 0; i <BusbarList.size(); i++) {	//BusbarList.size()										
@@ -124,6 +131,23 @@ public class Main_file {
 									ConnectedBus2TrafoList.add(obj);
 								}
 							}
+							//7.c STORE THE BUSNUMBER AND CONNECTED SHUNTS NUMBER in an arraylist as bus2line objects
+							for (int i6 = 0; i6 <ShuntsList.size(); i6++) {								
+								
+								String RfdID_p1 = ShuntsList.get(i6).getRdfID();	
+								
+								//if the founded con_eq is a line
+								if (Terminal_ConductingEquipment_t3.equals(RfdID_p1)){
+									
+									//create an object
+									ConnectedBus2Shunt obj = new ConnectedBus2Shunt();
+									obj.setBusNum(i);
+									obj.setShuntNum(i6);
+									
+									//store object in list
+									ConnectedBus2ShuntList.add(obj);
+								}
+							}
 						}
 					}
 					
@@ -163,7 +187,7 @@ public class Main_file {
 												//if eq_con is not the same as the breaker but it is the same connectivity node
 												if (!Eq_con_rdfID_br.equals(Terminal_ConductingEquipment_t3) && ConnectivityNode_t2.equals(ConnectivityNode_t3) && !Terminal_ConductingEquipment_t3.equals(Terminal_ConductingEquipment_t)) {
 												
-													//7. STORE THE BUSNUMBER AND CONNECTED TROFONUMBER in an arraylist as bus2trafo objects 
+													//7.a STORE THE BUSNUMBER AND CONNECTED TROFONUMBER in an arraylist as bus2trafo objects 
 													for (int i6 = 0; i6 <PowerTransformerList.size(); i6++) {								
 														
 														String RfdID_p1 = PowerTransformerList.get(i6).getRdfID();	
@@ -181,7 +205,7 @@ public class Main_file {
 														}
 													}
 													
-													//7. STORE THE BUSNUMBER AND CONNECTED LINES NUMBER in an arraylist as bus2line objects
+													//7.b STORE THE BUSNUMBER AND CONNECTED LINES NUMBER in an arraylist as bus2line objects
 													for (int i6 = 0; i6 <ACLineSegmentList.size(); i6++) {								
 														
 														String RfdID_p1 = ACLineSegmentList.get(i6).getRdfID();	
@@ -196,6 +220,23 @@ public class Main_file {
 															
 															//store object in list
 															ConnectedBus2LineList.add(obj);
+														}
+													}
+													//7.c STORE THE BUSNUMBER AND CONNECTED SHUNTS NUMBER in an arraylist as bus2line objects
+													for (int i6 = 0; i6 <ShuntsList.size(); i6++) {								
+														
+														String RfdID_p1 = ShuntsList.get(i6).getRdfID();	
+														
+														//if the founded con_eq is a line
+														if (Terminal_ConductingEquipment_t3.equals(RfdID_p1)){
+															
+															//create an object
+															ConnectedBus2Shunt obj = new ConnectedBus2Shunt();
+															obj.setBusNum(i);
+															obj.setShuntNum(i6);
+															
+															//store object in list
+															ConnectedBus2ShuntList.add(obj);
 														}
 													}
 												}
@@ -216,6 +257,18 @@ public class Main_file {
 	//THE SIZE OF THE YBUS IS THE BusbarList.size().
 	int matrix_size = BusbarList.size();
 	
+	//print ConnectedBus2LineList
+			for (int i = 0; i <ConnectedBus2ShuntList.size(); i++) {								
+			
+				int busNum = ConnectedBus2ShuntList.get(i).getBusNum();	
+				int lineNum = ConnectedBus2ShuntList.get(i).getShuntNum();
+				int pp = ConnectedBus2ShuntList.size();
+				
+				String name = BusbarList.get(busNum).getName();
+				String name2 = ACLineSegmentList.get(lineNum).getName();
+				
+				System.out.println("busNum: " + busNum + name + "; lineNum: " + lineNum + name2 + "; size" + pp);	
+			}
 	//creating a list of objects bus2bus with bus2lines and bus2trafo connections.
 	for (int i = 0; i <matrix_size-1; i++) {//all busses -1
 		for (int i2 = i+1; i2 <matrix_size; i2++) {//all busses starts +1
@@ -311,9 +364,23 @@ public class Main_file {
 					}
 				}
 			}
-		}
+		}	
+				
 	}
+	
+	//1.b. bus2shunt. Store values in the ConnectedBus2BusList. The position indicates the corresponding busnumber					
+	for (int i3 = 0; i3 <ConnectedBus2ShuntList.size(); i3++) {
 		
+			int conBus = ConnectedBus2ShuntList.get(i3).getBusNum();	
+			int conshunt = ConnectedBus2ShuntList.get(i3).getShuntNum();
+			
+			double b = ShuntsList.get(conshunt).getB();	
+			double g = ShuntsList.get(conshunt).getG();	
+			
+			ConnectedBus2BusList.get(conBus).setB_shunt(b);
+			ConnectedBus2BusList.get(conBus).setG_shunt(g);
+	}
+			
 	//print
 	System.out.println("------------Connections Between Busses--------------------");	
 	System.out.println("	Bus1	Bus2	Line1	Line2	Trafo	RatedS	RatedU");	

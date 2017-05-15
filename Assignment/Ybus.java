@@ -115,6 +115,22 @@ public class Ybus {
 			names[i] = "Y"+(i+1);
 		}
 		
+		//add shunts. The shunts are stored in ConnectedBus2BusList and there position in the array is the bussnumber.  
+		//for calculation details see: https://www.powerworld.com/files/S01SystemModeling.pdf
+		for (int i = 0; i <ConnectedBus2BusList.size(); i++) {	
+				double b_shunt = ConnectedBus2BusList.get(i).getB_Shunt();
+				if (b_shunt>0){
+					double g_shunt = ConnectedBus2BusList.get(i).getG_Shunt();
+					//Set base values			
+					double Base_S = ConnectedBus2BusList.get(i).getBase_S();
+					//per unit calc
+					double b_shunt_pu = b_shunt/Base_S;
+					double g_shunt_pu = g_shunt/Base_S;
+					Complex BG_Shunt_pu = new Complex(-b_shunt_pu,g_shunt_pu);//b absorbs and g injects.
+					data[i][i] = data[i][i].plus(BG_Shunt_pu);
+				}
+		}		
+		
 		//plott the Y-bus
 		JFrame frame = new JFrame();				
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -13,6 +13,8 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	public double x_line1;
 	public double r_line2;
 	public double x_line2;
+	public double b_shunt;
+	public double g_shunt;
 	public double base_volt;
 	public double base_S;
 	public int matrix_size;
@@ -47,6 +49,12 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	}	
 	public void setX_line2(double x_line2_1){		 
 		this.x_line2=x_line2_1;		
+	}
+	public void setB_shunt(double b_shunt_1){		 
+		this.b_shunt=b_shunt_1;		
+	}
+	public void setG_shunt(double g_shunt_1){		 
+		this.g_shunt=g_shunt_1;		
 	}
 	public void setBase_volt(double base_volt_1){		 
 		this.base_volt=base_volt_1;		
@@ -94,4 +102,10 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	public int getMatrix_size(){		 
 		return this.matrix_size;		
 	}	
+	public double getB_Shunt(){		 
+		return this.b_shunt;		
+	}
+	public double getG_Shunt(){		 
+		return this.g_shunt;		
+	}
 }

@@ -35,6 +35,9 @@ public class Base_constructor {
 	public double r;	
 	public double x;
 	
+	public double b;	
+	public double g;
+	
 	public String terminal_ConductingEquipment;
 	public String connectivityNode;		
 	
@@ -122,6 +125,12 @@ public class Base_constructor {
 	public void setX(double x_1){		
 		this.x = x_1;				
 	}
+	public void setB(double b_1){		
+		this.b = b_1;				
+	}
+	public void setG(double g_1){		
+		this.g = g_1;				
+	}
 	public void setTerminal_ConductingEquipment(String terminal_ConductingEquipment_1){		
 		this.terminal_ConductingEquipment = terminal_ConductingEquipment_1;				
 	}
@@ -195,6 +204,12 @@ public class Base_constructor {
 	}
 	public double getX(){		 
 		return this.x;		
+	}
+	public double getB(){		 
+		return this.b;		
+	}
+	public double getG(){		 
+		return this.g;		
 	}
 	public String getTerminal_ConductingEquipment(){		 
 		return this.terminal_ConductingEquipment;		
