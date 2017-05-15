@@ -15,6 +15,7 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	public double x_line2;
 	public double base_volt;
 	public double base_S;
+	public int matrix_size;
 	
 	//Creating a constructor
 	public ConnectedBus2Bus(){		
@@ -53,6 +54,11 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	public void setBase_S(double base_S_1){		 
 		this.base_S=base_S_1;		
 	}
+	public void setMatrix_size(int matrix_size_1){		 
+		this.matrix_size=matrix_size_1;		
+	}
+	
+	
 		
 	//get.RdfID Method
 	public int getBus2Num(){		 
@@ -85,4 +91,7 @@ public class ConnectedBus2Bus extends ConnectedBus2Line {
 	public double getBase_S(){		 
 		return this.base_S;		
 	}
+	public int getMatrix_size(){		 
+		return this.matrix_size;		
+	}	
 }

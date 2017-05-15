@@ -73,7 +73,7 @@ public class RegulatingControl extends Base_constructor {
 								
 								if (rdfID2.equals(rdfID)){
 									//System.out.println("rdfID: " + rdfID2);
-									double targetValue = Double.parseDouble(ReadNode.parameter(theNode2,"cim:RegulatingControl.targetValue"));	
+									targetValue = Double.parseDouble(ReadNode.parameter(theNode2,"cim:RegulatingControl.targetValue"));	
 									obj.setTargetValue(targetValue);	
 								}
 								
@@ -81,10 +81,7 @@ public class RegulatingControl extends Base_constructor {
 						}
 						catch(Exception e){
 							e.printStackTrace();
-						}			
-						
-								
-						
+						}		
 						
 						//print
 						System.out.println("rdfID: " + rdfID + "; Name: " + name + "; TargetValue: " + targetValue );		

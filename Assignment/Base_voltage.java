@@ -65,8 +65,9 @@ public class Base_voltage extends Base_constructor {
 			preparedStmt.setString(1, rdfID);
 			preparedStmt.setDouble(2, nom_val);		
 			preparedStmt.execute();
-			}
-			catch(Exception e){System.out.println(e);}		
+		}
+		catch(Exception e){System.out.println(e);
+		}		
 		
 	}
 		

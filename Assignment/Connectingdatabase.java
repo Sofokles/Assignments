@@ -4,22 +4,18 @@ import java.sql.*;
 
 public class Connectingdatabase {	
 	
-		// Building a null constructor for class
-		public Connectingdatabase(){
-				}
+	// Building a BASE constructor for class
+	public Connectingdatabase(){
+			}
 		// Connecting to database
-		
 		public static Connection makeConnection() throws Exception{
 			//
 			Statement stmt = null;
 			try{
 				// JDBC driver name and database URL
-				 final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-				 final String DB_URL = "jdbc:mysql://localhost/";
-				 final String DISABLE_SSL = "?useSSL=false";
-				 
-				//String driver = "com.mysql.jdbc.Driver";
-				//String url = "jdbc:mysql://localhost:3306/";
+				final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+				final String DB_URL = "jdbc:mysql://localhost/";
+				final String DISABLE_SSL = "?useSSL=false";
 				final String USER  = "root";
 				final String PASS = "Korsband321";
 				

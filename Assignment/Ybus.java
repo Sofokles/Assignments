@@ -10,32 +10,35 @@ import javax.swing.JTable;
 
 public class Ybus {
 
-	//calculating Ybus using ConnectedBus2BusList2, PowerTransformerList, ACLineSegmentList
-		public static void ybus(ArrayList<ConnectedBus2Bus>ConnectedBus2BusList2){		
+	//calculating Ybus using ConnectedBus2BusList, PowerTransformerList, ACLineSegmentList
+		public static void ybus(ArrayList<ConnectedBus2Bus>ConnectedBus2BusList){		
 		
-					
+		int size = ConnectedBus2BusList.get(0).getMatrix_size();//use the size of the corrected busmatrix
+		
 		//initalize complex values and store data				
 		Complex zero = new Complex(0,0);
 		Complex Z0 = new Complex(1,0);		
-		Complex [][] data = new Complex [5][5];
+		Complex [][] data = new Complex [size][size];
+		String [] names = new String [size];
 		
 		//calculate Y-bus--------------
-		//int size = ConnectedBus2BusList2.size();
-		for (int i = 0; i <ConnectedBus2BusList2.size(); i++) {	
-			int bus1 = ConnectedBus2BusList2.get(i).getBusNum();
-			int bus2 = ConnectedBus2BusList2.get(i).getBus2Num();
+		//int size = ConnectedBus2BusList.size();
+		for (int i = 0; i <ConnectedBus2BusList.size(); i++) {	
+			int bus1 = ConnectedBus2BusList.get(i).getBusNum();
+			int bus2 = ConnectedBus2BusList.get(i).getBus2Num();
 			
 			//Set base values					
-			double Base_V = ConnectedBus2BusList2.get(i).getBase_volt();
-			double Base_S = ConnectedBus2BusList2.get(i).getBase_S();					
+			double Base_V = ConnectedBus2BusList.get(i).getBase_volt();
+			double Base_S = ConnectedBus2BusList.get(i).getBase_S();	
+			//Base_S=1;
 			double Z_base = Base_V*Base_V/Base_S;
 			
 			//calculate admittances Y for all one line connections
-			if (ConnectedBus2BusList2.get(i).getLineNum()>-1){
+			if (ConnectedBus2BusList.get(i).getLineNum()>-1){
 				
 				//get data
-				double r_line1 = ConnectedBus2BusList2.get(i).getR_Line1();
-				double x_line1 = ConnectedBus2BusList2.get(i).getX_Line1();						
+				double r_line1 = ConnectedBus2BusList.get(i).getR_Line1();
+				double x_line1 = ConnectedBus2BusList.get(i).getX_Line1();						
 				
 				//per unit calc
 				double r_line1_pu = r_line1/Z_base;
@@ -50,12 +53,12 @@ public class Ybus {
 				data[bus2][bus1] = Y_L1;
 			}
 			//calculate admittances Y for all two line connections
-			if (ConnectedBus2BusList2.get(i).getLine2Num()>-1){
+			if (ConnectedBus2BusList.get(i).getLine2Num()>-1){
 				//get data
-				double r_line1 = ConnectedBus2BusList2.get(i).getR_Line1();
-				double x_line1 = ConnectedBus2BusList2.get(i).getX_Line1();		
-				double r_line2 = ConnectedBus2BusList2.get(i).getR_Line2();
-				double x_line2 = ConnectedBus2BusList2.get(i).getX_Line2();						
+				double r_line1 = ConnectedBus2BusList.get(i).getR_Line1();
+				double x_line1 = ConnectedBus2BusList.get(i).getX_Line1();		
+				double r_line2 = ConnectedBus2BusList.get(i).getR_Line2();
+				double x_line2 = ConnectedBus2BusList.get(i).getX_Line2();						
 				
 				//per unit calc
 				double r_line1_pu = r_line1/Z_base;
@@ -75,10 +78,10 @@ public class Ybus {
 				data[bus2][bus1] = Y_L2.plus(Y_L1);
 			}
 			//calculate admittances Y for all powertransformer connections
-			else if (ConnectedBus2BusList2.get(i).getTrafoNum()>-1){
+			else if (ConnectedBus2BusList.get(i).getTrafoNum()>-1){
 				//get data
-				double r_trafo = ConnectedBus2BusList2.get(i).getR_trafo();
-				double x_trafo = ConnectedBus2BusList2.get(i).getX_trafo();						
+				double r_trafo = ConnectedBus2BusList.get(i).getR_trafo();
+				double x_trafo = ConnectedBus2BusList.get(i).getX_trafo();						
 				
 				//per unit calc
 				double r_trafo_pu = r_trafo/Z_base;
@@ -97,17 +100,19 @@ public class Ybus {
 				Complex Y_0 = zero;
 				data[bus1][bus2] = Y_0;
 				data[bus2][bus1] = Y_0;
-			}			
+			}	
 		}
 		
 		//calculate the Yxx, summerize...
-		for (int i = 0; i <5; i++) {	
+		for (int i = 0; i <size; i++) {	
 			data[i][i] = zero;
-			for (int i2 = 0; i2 <5; i2++) {	
+			for (int i2 = 0; i2 <size; i2++) {	
 				if (i!=i2){
 					data[i][i] = data[i][i].minus(data[i][i2]);
 				}
 			}
+			//set column names
+			names[i] = "Y"+(i+1);
 		}
 		
 		//plott the Y-bus
@@ -115,7 +120,7 @@ public class Ybus {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    
 	    Object rowData[][] = data;
-	    Object columnNames[] = { "Y_i1", "Y_i2", "Y_i3", "Y_i4", "Y_i5", };
+	    Object columnNames[] = names;
 	    
 	    JTable table = new JTable(rowData, columnNames);
 	    JScrollPane scrollPane = new JScrollPane(table);
@@ -123,6 +128,7 @@ public class Ybus {
 	    frame.setSize(1024, 500);
 	    frame.setTitle("Y-bus");
 	    frame.setVisible(true);
+	    table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 	}
 }
       

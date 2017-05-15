@@ -2,6 +2,8 @@ package Assignment;
 
 
 //this constructor is used as a base constructor for all classes
+//1. all the public variables are declared here
+//2. all set and get methods are created here
 public class Base_constructor {
 	
 	public String rdfID;	

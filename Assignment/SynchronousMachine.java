@@ -101,23 +101,23 @@ public class SynchronousMachine extends Base_constructor {
 		System.out.println("rdfID: " + rdfID + "; Name: " + name + "; P: " + P + "; Q: " + Q + "; Eq_con_rdfID: " + eq_con_rdfID );				
 				
 		//save data in SQL database
-				try{
-					Connection conn1 = (Connection) Connectingdatabase.makeConnection();			
-					String query = "insert into SynchronousMachine values (?,?,?,?,?,?,?,?)";
-					PreparedStatement preparedStmt = conn1.prepareStatement(query);
-					preparedStmt.setString(1, rdfID);
-					preparedStmt.setString(2, name);
-					preparedStmt.setDouble(3, ratedS);
-					preparedStmt.setDouble(4, P);
-					preparedStmt.setDouble(5, Q);
-					preparedStmt.setString(6, genUnit_rdfID);
-					preparedStmt.setString(7, regControl_rdfID);
-					preparedStmt.setString(8, eq_con_rdfID);			
-					preparedStmt.execute();
-				}
-				catch(Exception e){
-					System.out.println(e);
-				}	
+		try{
+			Connection conn1 = (Connection) Connectingdatabase.makeConnection();			
+			String query = "insert into SynchronousMachine values (?,?,?,?,?,?,?,?)";
+			PreparedStatement preparedStmt = conn1.prepareStatement(query);
+			preparedStmt.setString(1, rdfID);
+			preparedStmt.setString(2, name);
+			preparedStmt.setDouble(3, ratedS);
+			preparedStmt.setDouble(4, P);
+			preparedStmt.setDouble(5, Q);
+			preparedStmt.setString(6, genUnit_rdfID);
+			preparedStmt.setString(7, regControl_rdfID);
+			preparedStmt.setString(8, eq_con_rdfID);			
+			preparedStmt.execute();
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}	
 		
 		
 		//return the object
